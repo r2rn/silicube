@@ -1,0 +1,22 @@
+[package]
+name = "silicube"
+description = "A library for sandboxed code execution"
+edition.workspace = true
+version.workspace = true
+
+[features]
+default = []
+# Enable integration tests that require the isolate binary
+integration-tests = []
+
+[dependencies]
+anyhow.workspace = true
+config.workspace = true
+serde.workspace = true
+thiserror.workspace = true
+tokio.workspace = true
+tracing.workspace = true
+
+[dev-dependencies]
+tokio.workspace = true
+proptest.workspace = true

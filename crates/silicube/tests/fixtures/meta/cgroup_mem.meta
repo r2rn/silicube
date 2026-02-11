@@ -1,0 +1,5 @@
+time:0.100
+time-wall:0.150
+cg-mem:524288
+max-rss:512000
+exitcode:0

@@ -1,0 +1,6 @@
+time:0.010
+time-wall:0.020
+max-rss:1000
+exitsig:11
+status:SG
+message:Caught fatal signal 11

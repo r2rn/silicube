@@ -1,0 +1,7 @@
+# Invalid: extension contains dot
+[languages.test]
+name = "Test"
+extension = ".test"
+
+[languages.test.run]
+command = ["./test"]

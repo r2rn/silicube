@@ -1,0 +1,38 @@
+# Git
+.git
+.gitignore
+
+# Nix
+.envrc
+.direnv/
+result
+result-*
+silicube-image
+silicube-test
+
+# Rust
+target/
+
+# Editor/IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Documentation (not needed for build)
+docs/
+*.md
+!README.md
+
+# Local configuration
+*.local
+.env
+.env.*
+
+# Logs
+*.log

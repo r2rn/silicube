@@ -1,0 +1,39 @@
+# Full configuration with all options
+isolate_path = "/usr/local/bin/isolate"
+
+[default_limits]
+time_limit = 2.0
+wall_time_limit = 5.0
+memory_limit = 262144
+stack_limit = 131072
+max_processes = 1
+max_output = 65536
+max_open_files = 64
+extra_time = 0.5
+
+[languages.cpp17]
+name = "C++ 17 (GCC)"
+extension = "cpp"
+
+[languages.cpp17.compile]
+command = ["g++", "-std=c++17", "-O2", "-Wall", "-o", "{output}", "{source}"]
+source_name = "main.cpp"
+output_name = "main"
+
+[languages.cpp17.compile.limits]
+time_limit = 30.0
+memory_limit = 524288
+
+[languages.cpp17.run]
+command = ["./{binary}"]
+path = "/usr/bin:/bin"
+
+[languages.cpp17.run.env]
+LC_ALL = "C"
+
+[languages.python3]
+name = "Python 3"
+extension = "py"
+
+[languages.python3.run]
+command = ["python3", "{source}"]

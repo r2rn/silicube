@@ -1,0 +1,7 @@
+# Minimal valid configuration
+[languages.test]
+name = "Test Language"
+extension = "test"
+
+[languages.test.run]
+command = ["./test"]

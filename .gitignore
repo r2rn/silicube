@@ -1,0 +1,9 @@
+.DS_Store
+.envrc
+.direnv/
+
+target/
+result
+result-*
+silicube-image
+silicube-test

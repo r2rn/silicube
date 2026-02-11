@@ -1,0 +1,149 @@
+# Silicube Configuration Example
+# Copy this file to silicube.toml and modify as needed
+
+# Path to the isolate binary (optional, uses PATH if not specified)
+# isolate_path = "/usr/local/bin/isolate"
+
+# Use cgroup memory limiting instead of RLIMIT_AS.
+# When enabled, memory_limit restricts actual memory usage (RSS) rather than
+# virtual address space. Required for runtimes like the JVM and Go that map
+# large amounts of virtual memory. Requires cgroup v2 support from the host.
+# If cgroups are unavailable at runtime, silicube falls back to RLIMIT_AS.
+cgroup = true
+
+# Cgroup root path for isolate. Must match isolate's cg_root config value.
+# Silicube creates this cgroup directory and enables the memory controller on
+# startup, replacing the need for isolate-cg-keeper / systemd.
+# cg_root = "/sys/fs/cgroup/isolate"
+
+# Global directory mounts applied to all sandbox invocations.
+# These are passed as --dir flags to isolate for both compilation and execution.
+# Set `optional = true` for mounts that may not exist on all systems.
+[[sandbox_mounts]]
+source = "/nix/store"
+target = "/nix/store"
+optional = true
+
+# Default resource limits for all executions
+[default_limits]
+time_limit = 2.0        # CPU time limit in seconds
+wall_time_limit = 5.0   # Wall clock time limit in seconds
+memory_limit = 262144   # Memory limit in KB (256 MB)
+stack_limit = 262144    # Stack size limit in KB (256 MB)
+max_processes = 1       # Maximum number of processes/threads
+max_output = 65536      # Maximum output size in KB (64 MB)
+max_open_files = 64     # Maximum number of open files
+extra_time = 0.5        # Extra time before killing (grace period)
+
+# Language configurations
+# The key (e.g., "cpp17") is the language ID used in the CLI
+
+[languages.cpp17]
+name = "C++ 17 (GCC)"
+extension = "cpp"
+
+[languages.cpp17.compile]
+command = ["g++", "-std=c++17", "-O2", "-Wall", "-o", "{output}", "{source}"]
+source_name = "main.cpp"
+output_name = "main"
+
+[languages.cpp17.run]
+command = ["./{binary}"]
+
+[languages.cpp20]
+name = "C++ 20 (GCC)"
+extension = "cpp"
+
+[languages.cpp20.compile]
+command = ["g++", "-std=c++20", "-O2", "-Wall", "-o", "{output}", "{source}"]
+source_name = "main.cpp"
+output_name = "main"
+
+[languages.cpp20.run]
+command = ["./{binary}"]
+
+[languages.c]
+name = "C (GCC)"
+extension = "c"
+
+[languages.c.compile]
+command = ["gcc", "-std=c17", "-O2", "-Wall", "-o", "{output}", "{source}", "-lm"]
+source_name = "main.c"
+output_name = "main"
+
+[languages.c.run]
+command = ["./{binary}"]
+
+[languages.python3]
+name = "Python 3"
+extension = "py"
+
+[languages.python3.run]
+command = ["python3", "{source}"]
+
+[languages.java]
+name = "Java"
+extension = "java"
+
+[languages.java.compile]
+command = ["javac", "{source}"]
+source_name = "Main.java"
+output_name = "Main.class"
+
+[languages.java.compile.limits]
+# JVM spawns many threads (GC, JIT, etc.)
+max_processes = 50
+
+[languages.java.run]
+command = ["java", "-Xmx256m", "-Xss1m", "Main"]
+
+[languages.java.run.limits]
+# JVM requires threads for GC, JIT, etc.
+max_processes = 50
+
+[languages.rust]
+name = "Rust"
+extension = "rs"
+
+[languages.rust.compile]
+command = ["rustc", "-O", "-o", "{output}", "{source}"]
+source_name = "main.rs"
+output_name = "main"
+
+[languages.rust.run]
+command = ["./{binary}"]
+
+[languages.go]
+name = "Go"
+extension = "go"
+
+[languages.go.compile]
+command = ["go", "build", "-o", "{output}", "{source}"]
+source_name = "main.go"
+output_name = "main"
+
+[languages.go.compile.env]
+GOCACHE = "/box/.cache/go-build"
+GOPATH = "/box/.go"
+
+[languages.go.compile.limits]
+# Go compiler fork/execs compile+asm per package in parallel
+max_processes = 200
+
+[languages.go.run]
+command = ["./{binary}"]
+
+[languages.go.run.limits]
+# Go runtime requires threads for scheduler and GC
+max_processes = 20
+
+[languages.javascript]
+name = "JavaScript (Node.js)"
+extension = "js"
+
+[languages.javascript.run]
+command = ["node", "{source}"]
+
+[languages.javascript.run.limits]
+# Node.js requires threads for V8 and libuv thread pool
+max_processes = 20

@@ -1,0 +1,18 @@
+[package]
+name = "silicube-cli"
+description = "CLI for orchestrating sandboxed code execution"
+edition.workspace = true
+version.workspace = true
+
+[[bin]]
+name = "silicube"
+path = "src/main.rs"
+
+[dependencies]
+silicube.workspace = true
+
+anyhow.workspace = true
+clap.workspace = true
+tokio.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true

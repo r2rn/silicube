@@ -1,0 +1,7 @@
+# Invalid: empty language name
+[languages.test]
+name = ""
+extension = "test"
+
+[languages.test.run]
+command = ["./test"]
