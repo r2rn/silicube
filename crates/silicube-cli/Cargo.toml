@@ -3,6 +3,8 @@ name = "silicube-cli"
 description = "CLI for orchestrating sandboxed code execution"
 edition.workspace = true
 version.workspace = true
+license.workspace = true
+repository.workspace = true
 
 [[bin]]
 name = "silicube"

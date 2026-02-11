@@ -1,14 +1,17 @@
 [workspace]
 resolver = "2"
 members = ["crates/*"]
+default-members = ["crates/silicube-cli"]
 
 [workspace.package]
 name = "silicube"
 version = "0.1.0"
 edition = "2024"
+license = "MIT"
+repository = "https://github.com/r2rn/silicube"
 
 [workspace.dependencies]
-silicube = { path = "crates/silicube" }
+silicube = { path = "crates/silicube", version = "0.1.0" }
 
 anyhow = "1.0"
 clap = { version = "4", features = ["derive"] }
