@@ -4,19 +4,18 @@
 
 use thiserror::Error;
 
+use crate::config::{Config, Language};
+use crate::isolate::{IsolateBox, IsolateError};
 pub use crate::runner::compile::{CompileResult, compile};
 pub use crate::runner::execute::{execute, execute_interpreted};
 pub use crate::runner::interactive::{
     InteractiveEvent, InteractiveEventStream, InteractiveSession, InteractiveSessionHandle,
 };
+use crate::types::{ExecutionResult, ResourceLimits};
 
 mod compile;
 mod execute;
 mod interactive;
-
-use crate::config::{Config, Language};
-use crate::isolate::{IsolateBox, IsolateError};
-use crate::types::{ExecutionResult, ResourceLimits};
 
 /// Request for compiling and running code in one step
 #[derive(Debug)]
@@ -78,6 +77,9 @@ pub enum InteractiveError {
 
     #[error("isolate error: {0}")]
     Isolate(#[from] IsolateError),
+
+    #[error("wait timed out")]
+    Timeout,
 }
 
 /// Errors that occur during compile-and-run operations

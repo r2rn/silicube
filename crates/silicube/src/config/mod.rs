@@ -12,10 +12,6 @@ use crate::types::{MountConfig, ResourceLimits};
 pub mod language;
 mod loader;
 
-fn default_cg_root() -> PathBuf {
-    PathBuf::from("/sys/fs/cgroup/isolate")
-}
-
 /// Example configuration embedded at compile time.
 ///
 /// Library users can access this to generate a starter config file.
@@ -126,6 +122,10 @@ impl Default for Config {
     fn default() -> Self {
         Self::parse_toml(EXAMPLE_CONFIG).expect("embedded default config should be valid")
     }
+}
+
+fn default_cg_root() -> PathBuf {
+    PathBuf::from("/sys/fs/cgroup/isolate")
 }
 
 #[cfg(test)]

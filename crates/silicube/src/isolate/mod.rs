@@ -7,7 +7,8 @@
 //! - https://www.ucw.cz/isolate/isolate.1.html
 //! - https://github.com/ioi/isolate
 
-use std::path::PathBuf;
+use std::fs;
+use std::path::{Path, PathBuf};
 
 use thiserror::Error;
 
@@ -15,13 +16,52 @@ pub use crate::isolate::box_manager::{BoxPool, IsolateBox};
 pub use crate::isolate::command::{IsolateAction, IsolateCommand};
 pub use crate::isolate::meta::{MetaFile, MetaParseError};
 pub use crate::isolate::process::{IsolateProcess, run_batch, run_with_output};
+use crate::types::MountConfig;
 
 mod box_manager;
 mod command;
 mod meta;
 mod process;
 
-use crate::types::MountConfig;
+/// Errors that occur during isolate sandbox operations
+#[derive(Debug, Error)]
+pub enum IsolateError {
+    #[error("failed to initialize box {id}: {message}")]
+    InitFailed { id: u32, message: String },
+
+    #[error("failed to cleanup box {id}: {message}")]
+    CleanupFailed { id: u32, message: String },
+
+    #[error("isolate command failed: {0}")]
+    CommandFailed(String),
+
+    #[error("failed to spawn isolate process: {0}")]
+    SpawnFailed(#[source] std::io::Error),
+
+    #[error("failed to parse meta file: {0}")]
+    MetaParseFailed(String),
+
+    #[error("box {0} not found or not initialized")]
+    BoxNotFound(u32),
+
+    #[error("no available boxes in pool")]
+    PoolExhausted,
+
+    #[error("I/O error: {0}")]
+    Io(#[from] std::io::Error),
+
+    #[error("isolate binary not found at {0}")]
+    BinaryNotFound(PathBuf),
+
+    #[error("invalid path: {0}")]
+    InvalidPath(String),
+
+    #[error("mount source path does not exist: {0}")]
+    MountSourceNotFound(String),
+
+    #[error("stdin is closed")]
+    StdinClosed,
+}
 
 /// Attempt to set up the cgroup v2 hierarchy for isolate.
 ///
@@ -32,10 +72,7 @@ use crate::types::MountConfig;
 ///
 /// Returns `Ok(true)` if cgroups are ready, `Ok(false)` if setup failed and the
 /// caller should fall back to non-cgroup mode (RLIMIT_AS).
-pub fn prepare_cgroup(cg_root: &std::path::Path) -> Result<bool, std::io::Error> {
-    use std::fs;
-    use std::path::Path;
-
+pub fn prepare_cgroup(cg_root: &Path) -> Result<bool, IsolateError> {
     let cg_base = Path::new("/sys/fs/cgroup");
 
     // Check if cgroup v2 is available
@@ -83,50 +120,11 @@ pub fn prepare_cgroup(cg_root: &std::path::Path) -> Result<bool, std::io::Error>
     Ok(true)
 }
 
-/// Errors that occur during isolate sandbox operations
-#[derive(Debug, Error)]
-pub enum IsolateError {
-    #[error("failed to initialize box {id}: {message}")]
-    InitFailed { id: u32, message: String },
-
-    #[error("failed to cleanup box {id}: {message}")]
-    CleanupFailed { id: u32, message: String },
-
-    #[error("isolate command failed: {0}")]
-    CommandFailed(String),
-
-    #[error("failed to spawn isolate process: {0}")]
-    SpawnFailed(#[source] std::io::Error),
-
-    #[error("failed to parse meta file: {0}")]
-    MetaParseFailed(String),
-
-    #[error("box {0} not found or not initialized")]
-    BoxNotFound(u32),
-
-    #[error("no available boxes in pool")]
-    PoolExhausted,
-
-    #[error("I/O error: {0}")]
-    Io(#[from] std::io::Error),
-
-    #[error("isolate binary not found at {0}")]
-    BinaryNotFound(PathBuf),
-
-    #[error("invalid path: {0}")]
-    InvalidPath(String),
-
-    #[error("mount source path does not exist: {0}")]
-    MountSourceNotFound(String),
-}
-
 /// Validate that all mount source paths exist
 ///
 /// Returns an error if any non-optional mount source path does not exist on the host filesystem.
 /// Optional mounts (with `optional: true`) are silently skipped if the source doesn't exist.
 pub fn validate_mounts(mounts: &[MountConfig]) -> Result<(), IsolateError> {
-    use std::path::Path;
-
     for mount in mounts {
         if mount.optional {
             continue;
@@ -175,7 +173,6 @@ pub fn resolve_command(command: &mut [String]) -> Result<(), IsolateError> {
     }
 
     Err(IsolateError::CommandFailed(format!(
-        "command '{}' not found in PATH",
-        first
+        "command '{first}' not found in PATH",
     )))
 }

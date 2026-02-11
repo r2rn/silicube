@@ -258,10 +258,7 @@ impl InteractiveSession {
     ) -> Result<ExecutionResult, InteractiveError> {
         match tokio::time::timeout(timeout, self.wait()).await {
             Ok(result) => result,
-            Err(_) => Err(InteractiveError::Io(std::io::Error::new(
-                std::io::ErrorKind::TimedOut,
-                "wait timed out",
-            ))),
+            Err(_) => Err(InteractiveError::Timeout),
         }
     }
 }

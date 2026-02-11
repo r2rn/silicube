@@ -214,10 +214,7 @@ impl IsolateProcess {
             stdin.flush().await?;
             Ok(())
         } else {
-            Err(IsolateError::Io(std::io::Error::new(
-                std::io::ErrorKind::BrokenPipe,
-                "stdin closed",
-            )))
+            Err(IsolateError::StdinClosed)
         }
     }
 

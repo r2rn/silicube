@@ -7,6 +7,9 @@ use crate::types::{MountConfig, ResourceLimits};
 
 const INVALID_FILE_EXT_CHARS: [char; 2] = ['/', '.'];
 
+/// Default PATH for sandbox execution
+pub const DEFAULT_SANDBOX_PATH: &str = "/usr/bin:/bin";
+
 /// Configuration for a programming language
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Language {
@@ -114,9 +117,6 @@ pub struct CompileConfig {
     #[serde(default)]
     pub limits: Option<ResourceLimits>,
 }
-
-/// Default PATH for sandbox execution
-pub const DEFAULT_SANDBOX_PATH: &str = "/usr/bin:/bin";
 
 /// Configuration for the execution step
 #[derive(Debug, Clone, Serialize, Deserialize)]

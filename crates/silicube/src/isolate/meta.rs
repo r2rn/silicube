@@ -6,11 +6,14 @@
 use std::collections::HashMap;
 use std::path::Path;
 
+use thiserror::Error;
+
 use crate::isolate::IsolateError;
 use crate::types::{ExecutionResult, ExecutionStatus, LimitExceeded};
 
 /// Error that occurs during meta file parsing
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Error)]
+#[error("meta file parse error at line {line_number}: {message} (line: {line:?})")]
 pub struct MetaParseError {
     /// Line number (1-indexed) where the error occurred
     pub line_number: usize,
@@ -19,18 +22,6 @@ pub struct MetaParseError {
     /// Description of the error
     pub message: String,
 }
-
-impl std::fmt::Display for MetaParseError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(
-            f,
-            "meta file parse error at line {}: {} (line: {:?})",
-            self.line_number, self.message, self.line
-        )
-    }
-}
-
-impl std::error::Error for MetaParseError {}
 
 /// Parsed meta file from Isolate
 #[derive(Debug, Clone, Default)]
