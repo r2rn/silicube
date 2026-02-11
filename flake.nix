@@ -25,11 +25,17 @@
         pname = cargoToml.workspace.package.name;
         version = cargoToml.workspace.package.version;
 
-        rustToolchain = pkgs.rust-bin.nightly.latest.default.override {
+        # Stable toolchain for building (keeps downstream on stable)
+        rustToolchain = pkgs.rust-bin.stable.latest.default.override {
           extensions = [
             "rust-src"
             "rust-analyzer"
           ];
+        };
+
+        # Nightly rustfmt for unstable formatting options (group_imports, etc.)
+        rustfmtNightly = pkgs.rust-bin.nightly.latest.default.override {
+          extensions = ["rustfmt"];
         };
 
         # Use mold on Linux, otherwise use default linker
@@ -113,6 +119,7 @@
         devShells.default = pkgs.mkShell {
           buildInputs = devBuildInputs ++ pkgs.lib.optionals pkgs.stdenv.isLinux [isolate];
           RUSTFLAGS = rustFlags;
+          RUSTFMT = "${rustfmtNightly}/bin/rustfmt";
         };
       }
     );

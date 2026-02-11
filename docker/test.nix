@@ -1,7 +1,7 @@
 # Pure Nix test image builder using dockerTools
 #
 # This creates a container image containing isolate, the runtime environment,
-# and a Rust nightly toolchain for compiling and running integration tests.
+# and a Rust stable toolchain for compiling and running integration tests.
 #
 # Usage:
 #    nix build .#docker-test

@@ -1,7 +1,7 @@
 # Build test image for running integration tests
 #
 # This Dockerfile uses a multi-stage build to create a container with
-# both the Nix-built isolate/runtime and a Rust nightly toolchain for
+# both the Nix-built isolate/runtime and a Rust stable toolchain for
 # compiling and running the test suite.
 #
 # Usage:
@@ -35,8 +35,8 @@ RUN ln -s $(nix path-info .#isolate)/bin/* /output/bin/ && \
         ln -sf "$pkg" /output/bin/ 2>/dev/null || true; \
     done
 
-# Stage 2: Test runner with Rust nightly
-FROM rustlang/rust:nightly-bookworm AS test-runner
+# Stage 2: Test runner with Rust stable
+FROM rust:bookworm AS test-runner
 
 # Copy Nix store and convenience symlinks from builder
 COPY --from=nix-builder /output/nix/store /nix/store

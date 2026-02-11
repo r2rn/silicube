@@ -858,7 +858,7 @@ dependencies = [
 
 [[package]]
 name = "silicube"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "anyhow",
  "config",
@@ -871,7 +871,7 @@ dependencies = [
 
 [[package]]
 name = "silicube-cli"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "anyhow",
  "clap",
