@@ -55,21 +55,32 @@ Unit tests (no special requirements):
 cargo test -p silicube
 ```
 
-Integration tests require root and the `isolate` binary. The easiest way is via Docker:
+Integration tests require Linux, root privileges, and `isolate` (which uses kernel namespaces and cgroups). The easiest way is via the Nix-built Docker test image:
 
 ```sh
-# Local dev (mounts source, caches dependencies between runs)
+# Run all integration tests
 ./scripts/run-tests.sh
-
-# CI mode (hermetic, no mounts)
-./scripts/run-tests.sh --ci
 
 # Pass extra args to cargo test
 ./scripts/run-tests.sh -- --test-threads=1
+
+# Run a specific test module
+./scripts/run-tests.sh -- sandbox_lifecycle
 ```
 
-Or with Nix:
+This builds a test image with `nix build .#docker-test`, loads it into Docker, and runs the tests inside a privileged container with your source mounted.
+
+### Running integration tests natively
+
+If you have `isolate` installed on your Linux system (e.g. via `nix build .#isolate`), you can run integration tests directly without Docker:
 
 ```sh
-./scripts/run-tests-nix.sh
+sudo -E cargo test -p silicube --features integration-tests -- --include-ignored
 ```
+
+Note that native execution requires:
+
+- Linux (Isolate uses kernel namespaces and cgroups)
+- Root privileges (or equivalent capabilities)
+- `isolate` on `$PATH`
+- Language toolchains from `toolchain.nix` available on the system
