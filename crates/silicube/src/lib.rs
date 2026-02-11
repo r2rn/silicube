@@ -6,11 +6,12 @@
 //!
 //! # Features
 //!
-//! - Sandboxed execution for running untrusted code safely using Isolate.
-//! - Support for multiple languages, both compiled and interpreted.
-//! - Flexible configuration with a TOML-based configuration file.
-//! - Interactive code execution with FIFO-based sessions for interactive programs.
-//! - Enforce resource limits such as CPU time, memory, and other resource constraints.
+//! - **Sandboxed execution** — Pool-based lifecycle for running untrusted code safely using Isolate.
+//! - **Multi-language** — Supports both compiled and interpreted languages.
+//! - **TOML configuration** — Flexible per-language compiler/runtime settings.
+//! - **Interactive execution** — FIFO-based sessions for interactive programs.
+//! - **Resource limits** — Enforce CPU time, memory, wall time, processes, and output constraints.
+//! - **cgroup v2 support** — Memory limiting in container environments.
 
 pub use config::{Config, EXAMPLE_CONFIG};
 pub use isolate::{BoxPool, prepare_cgroup};

@@ -1,9 +1,8 @@
 # Silicube
 
-Silicube is a tool wrapping IOI Isolate for sandboxed code execution. It can be run natively on Linux, or can be used inside a Docker container. Nix is used for toolchain management.
+Silicube is both a library and standalone tool wrapping IOI Isolate for sandboxed code execution.
 
-> [!NOTE]
-> This tool only works on Linux, given IOI Isolate requires Linux-specific kernel features such as namespaces and control groups.
+Since Isolate requires Linux-specific kernel features (e.g., namespaces, cgroups), it can only be run natively on Linux. To run it on other operating systems, you must use a Docker container. Nix is optionally used for toolchain management.
 
 Interactive execution is supported through the core `silicube` library. We may add additional "adapters" provided in `silicube-server` that provide HTTP and WebSocket interfaces later.
 
