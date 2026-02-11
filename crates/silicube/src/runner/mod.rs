@@ -14,11 +14,9 @@ mod compile;
 mod execute;
 mod interactive;
 
-use crate::{
-    config::{Config, Language},
-    isolate::{IsolateBox, IsolateError},
-    types::{ExecutionResult, ResourceLimits},
-};
+use crate::config::{Config, Language};
+use crate::isolate::{IsolateBox, IsolateError};
+use crate::types::{ExecutionResult, ResourceLimits};
 
 /// Request for compiling and running code in one step
 #[derive(Debug)]
