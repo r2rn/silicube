@@ -6,11 +6,6 @@ version.workspace = true
 license.workspace = true
 repository.workspace = true
 
-[features]
-default = []
-# Enable integration tests that require the isolate binary
-integration-tests = []
-
 [dependencies]
 anyhow.workspace = true
 config.workspace = true
@@ -22,3 +17,12 @@ tracing.workspace = true
 [dev-dependencies]
 tokio.workspace = true
 proptest.workspace = true
+
+[features]
+default = []
+# Enable integration tests that require the isolate binary
+integration-tests = []
+
+[[test]]
+name = "integration"
+path = "tests/integration/main.rs"
