@@ -137,10 +137,23 @@ pub struct ExecutionResult {
 
     /// cgroup memory in kilobytes (includes page cache).
     /// None if isolate didn't report cg-mem.
+    ///
+    /// When the sandbox is reused for both compilation and execution (the
+    /// common case for compiled languages), the compiler's page cache stays
+    /// in the cgroup, inflating this value for subsequent runs. For example,
+    /// a C++ compiler can leave hundreds of megabytes of page cache, so even
+    /// a trivial program will report that much here. Prefer
+    /// [`max_rss`](Self::max_rss) when you need the program's actual memory
+    /// usage.
     pub cg_memory: Option<u64>,
 
     /// Peak resident set size in kilobytes (process-only).
     /// None if isolate didn't report max-rss.
+    ///
+    /// Unlike [`cg_memory`](Self::cg_memory), this measures only the
+    /// process's own resident memory and is not affected by leftover page
+    /// cache from earlier steps like compilation. This is typically the
+    /// value you want to display as "memory used".
     pub max_rss: Option<u64>,
 
     /// Exit code if the program exited normally
