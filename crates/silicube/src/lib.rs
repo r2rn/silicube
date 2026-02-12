@@ -13,10 +13,14 @@
 //! - **Resource limits** — Enforce CPU time, memory, wall time, processes, and output constraints.
 //! - **cgroup v2 support** — Memory limiting in container environments.
 
-pub use config::{Config, EXAMPLE_CONFIG};
-pub use isolate::{BoxPool, prepare_cgroup};
-pub use runner::Runner;
-pub use types::ResourceLimits;
+pub use config::{Config, ConfigError, EXAMPLE_CONFIG, Language};
+pub use isolate::{BoxPool, IsolateBox, IsolateError, prepare_cgroup};
+pub use runner::{
+    CompileAndRunError, CompileAndRunRequest, CompileError, CompileResult, ExecuteError,
+    InteractiveError, InteractiveEvent, InteractiveEventStream, InteractiveSession,
+    InteractiveSessionHandle, Runner,
+};
+pub use types::{ExecutionResult, ExecutionStatus, LimitExceeded, MountConfig, ResourceLimits};
 
 pub mod config;
 pub mod isolate;
