@@ -158,6 +158,18 @@ impl MetaFile {
             .unwrap_or(0)
     }
 
+    /// Get cgroup memory usage in kilobytes (cg-mem from isolate meta).
+    /// Includes RSS + page cache + file-mapped memory for the entire cgroup.
+    pub fn cg_memory(&self) -> Option<u64> {
+        self.get_u64("cg-mem")
+    }
+
+    /// Get peak resident set size in kilobytes (max-rss from isolate meta).
+    /// Measures only the process's own resident memory.
+    pub fn max_rss(&self) -> Option<u64> {
+        self.get_u64("max-rss")
+    }
+
     /// Get the exit code
     pub fn exit_code(&self) -> Option<i32> {
         self.get_i32("exitcode")
@@ -205,6 +217,8 @@ impl MetaFile {
             time: self.time(),
             wall_time: self.wall_time(),
             memory: self.memory(),
+            cg_memory: self.cg_memory(),
+            max_rss: self.max_rss(),
             exit_code: self.exit_code(),
             signal: self.signal(),
             message: self.message(),

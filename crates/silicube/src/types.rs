@@ -132,8 +132,16 @@ pub struct ExecutionResult {
     /// Wall clock time used in seconds
     pub wall_time: f64,
 
-    /// Peak memory usage in kilobytes
+    /// Peak memory usage in kilobytes (cg-mem preferred, fallback to max-rss)
     pub memory: u64,
+
+    /// cgroup memory in kilobytes (includes page cache).
+    /// None if isolate didn't report cg-mem.
+    pub cg_memory: Option<u64>,
+
+    /// Peak resident set size in kilobytes (process-only).
+    /// None if isolate didn't report max-rss.
+    pub max_rss: Option<u64>,
 
     /// Exit code if the program exited normally
     pub exit_code: Option<i32>,
@@ -167,6 +175,8 @@ impl Default for ExecutionResult {
             time: 0.0,
             wall_time: 0.0,
             memory: 0,
+            cg_memory: None,
+            max_rss: None,
             exit_code: None,
             signal: None,
             message: None,
