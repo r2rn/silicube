@@ -178,6 +178,23 @@ impl ExecutionResult {
     pub fn is_success(&self) -> bool {
         matches!(self.status, ExecutionStatus::Ok) && self.exit_code == Some(0)
     }
+
+    /// If the process was killed and cgroup memory reached the configured limit,
+    /// classify as memory limit exceeded. This handles isolate versions that
+    /// report "Caught fatal signal 9" without mentioning "memory".
+    pub fn detect_memory_limit(&mut self, memory_limit: u64) {
+        if self.limit_exceeded.is_exceeded() {
+            return;
+        }
+        if matches!(
+            self.status,
+            ExecutionStatus::Signaled | ExecutionStatus::RuntimeError
+        ) && let Some(cg_mem) = self.cg_memory
+            && cg_mem >= memory_limit
+        {
+            self.limit_exceeded = LimitExceeded::Memory;
+        }
+    }
 }
 
 impl Default for ExecutionResult {
@@ -620,6 +637,56 @@ mod tests {
         assert!(result.message.is_none());
         assert!(result.stdout.is_none());
         assert!(result.stderr.is_none());
+    }
+
+    // detect_memory_limit tests
+
+    #[test]
+    fn detect_memory_limit_sets_memory_when_cg_mem_at_limit() {
+        let mut result = ExecutionResult {
+            status: ExecutionStatus::Signaled,
+            signal: Some(9),
+            cg_memory: Some(262144),
+            ..Default::default()
+        };
+        result.detect_memory_limit(262144);
+        assert_eq!(result.limit_exceeded, LimitExceeded::Memory);
+    }
+
+    #[test]
+    fn detect_memory_limit_noop_when_already_exceeded() {
+        let mut result = ExecutionResult {
+            status: ExecutionStatus::Signaled,
+            signal: Some(9),
+            limit_exceeded: LimitExceeded::Time,
+            cg_memory: Some(262144),
+            ..Default::default()
+        };
+        result.detect_memory_limit(262144);
+        assert_eq!(result.limit_exceeded, LimitExceeded::Time);
+    }
+
+    #[test]
+    fn detect_memory_limit_noop_when_ok_status() {
+        let mut result = ExecutionResult {
+            status: ExecutionStatus::Ok,
+            cg_memory: Some(262144),
+            ..Default::default()
+        };
+        result.detect_memory_limit(262144);
+        assert_eq!(result.limit_exceeded, LimitExceeded::NotExceeded);
+    }
+
+    #[test]
+    fn detect_memory_limit_noop_when_no_cg_memory() {
+        let mut result = ExecutionResult {
+            status: ExecutionStatus::Signaled,
+            signal: Some(9),
+            cg_memory: None,
+            ..Default::default()
+        };
+        result.detect_memory_limit(262144);
+        assert_eq!(result.limit_exceeded, LimitExceeded::NotExceeded);
     }
 
     // MountConfig tests

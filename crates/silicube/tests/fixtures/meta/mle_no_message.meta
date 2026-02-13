@@ -1,0 +1,6 @@
+time:0.100
+cg-mem:262144
+max-rss:260000
+status:SG
+exitsig:9
+message:Caught fatal signal 9

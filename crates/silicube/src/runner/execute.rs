@@ -66,6 +66,9 @@ pub async fn execute(
     // Validate mount source paths exist before running
     validate_mounts(&language.run.mounts).map_err(ExecuteError::Isolate)?;
 
+    // Save memory limit before effective_limits is moved
+    let memory_limit = effective_limits.memory_limit;
+
     // Build execute command
     let mut command = IsolateCommand::new(config.isolate_binary(), sandbox.id())
         .action(IsolateAction::Run)
@@ -83,9 +86,13 @@ pub async fn execute(
     }
 
     // Run the program
-    let result = run_batch(sandbox, command, input)
+    let mut result = run_batch(sandbox, command, input)
         .await
         .map_err(ExecuteError::Isolate)?;
+
+    if let Some(mem_limit) = memory_limit {
+        result.detect_memory_limit(mem_limit);
+    }
 
     debug!(
         status = ?result.status,

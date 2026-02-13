@@ -67,3 +67,14 @@ fn test_meta_cgroup_mem_priority() {
     // cg-mem should be preferred over max-rss
     assert_eq!(meta.memory(), 524288);
 }
+
+#[test]
+fn test_meta_mle_no_message_without_limits() {
+    // Documents the bug: without memory limit context, the meta parser
+    // alone cannot detect MLE when the message doesn't mention "memory"
+    let meta = load_meta_fixture("mle_no_message.meta");
+    assert_eq!(meta.status(), ExecutionStatus::Signaled);
+    assert_eq!(meta.signal(), Some(9));
+    // Parser returns NotExceeded because message is "Caught fatal signal 9"
+    assert_eq!(meta.limit_exceeded(), LimitExceeded::NotExceeded);
+}
